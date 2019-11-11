@@ -25,11 +25,11 @@ int main(int argc, char** argv) {
   for (int count = 1; count<argc; count++) {
     errorcode = config_checker(argv[count],count,argc);
     if (errorcode!=0) {return errorcode;}
-    print_file(argv[count]);
+    //print_file(argv[count]);
   }
   // Make the EnigmaMachine:
   EnigmaMachine Enigmamachine = EnigmaMachine(argv[1], argv[2]);
-    
+  // Add rotors:  
   if (argc>4){
     ifstream in;
     int initial_pos;
@@ -43,11 +43,9 @@ int main(int argc, char** argv) {
   }
   // Take Input and encrypt, returning an INVALID_INPUT_CHARACTER error if necessary
   char input;
-  cout << "Input is:  " << input;
   while (!(cin>>input).fail()) {
     if (input<65||input>95) {Enigmamachine.enigma_delete(); return error_finder(INVALID_INPUT_CHARACTER);}
-    cout << input;
-    //cout << Enigmamachine.enigma_encrypt(input);
+    cout << Enigmamachine.enigma_encrypt(input);
   }
   Enigmamachine.enigma_delete();
   cout << endl;
@@ -114,24 +112,88 @@ int component_config_checker(char const *filename, int inputnumber) {
   switch(inputnumber) {
   case 1 : if (counter%2!=0) {in.close(); return error_finder(INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS,filename);} break;
   case 2 : if (counter!=26) {in.close();cout<< inputnumber <<endl; return error_finder(INCORRECT_NUMBER_OF_REFLECTOR_PARAMETERS,filename);} break;
-  default : if (counter!=27) {in.close(); return error_finder(INVALID_ROTOR_MAPPING,filename);} break;
+  default : if (counter<26 || counter>32) {in.close(); return error_finder(INVALID_ROTOR_MAPPING,filename);} break;
   }
   // Close file and return NO_ERROR
   in.close();
   return error_finder(NO_ERROR);
 }
-
-void print_file(char *filename) {
-  int integer;
+/*
+// Plugboard Configuraton Checker
+// Called by Configuraton Checker Function
+int plugboard_config_checker(char const *filename, int inputnumber) {
+  // Declare (and) Initialise Variables
   ifstream in;
+  int integer;
+  int temparray[26] = {0};
+  int counter = 0;
+  // Check for ERROR_OPENING_CONFIGURATION_FILE error:
   in.open(filename);
-  cout << "New file: " << endl;
-  while(!(in>>integer).fail()) {
-    cout << integer << " ";
+  if (in.fail()) {return error_finder(ERROR_OPENING_CONFIGURATION_FILE,filename);}
+  // Run through the file contents and check for errors:
+  while (!(in>>integer).eof()) {
+    // Check for NON_NUMERIC_CHARACTER error:
+    if (in.fail()) {
+      in.close();
+      cerr << "Non-numeric character for mapping in plugboard file: " << filename << endl;
+      return NON_NUMERIC_CHARACTER;
+    }
+    // Check for INVALID_INDEX error:
+    if ((integer<0)||(integer>25)) {
+      in.close();
+      cerr << "Invalid index in plugboard file, " << integer << " is not a valid index in " filename << endl;
+      return INVALID_INDEX;
+    }
+    // Check for IMPOSSIBLE_PLUGBOARD_CONFIGURATION error:
+    if (temparray[integer]>0) {
+      in.close();
+      cerr << "Impossible plugboard configuration in plugboard file " << filename << endl;
+      return error_finder(IMPOSSIBLE_PLUGBOARD_CONFIGURATION,filename);
+    }
+    if (temparray[integer]>0) {
+      in.close()
+    temparray[integer]++;
+    counter++;
   }
-  cout << endl;
+  // Check for INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS / INCORRECT_NUMBER_OF_REFLECTOR PARAMETERS error:
+  if (counter%2!=0) {in.close(); return error_finder(INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS,filename);}
+  // Close file and return NO_ERROR
   in.close();
+  return error_finder(NO_ERROR);
 }
+  
+// Reflector Configuraton Checker
+// Called by Configuraton Checker Function
+int reflector_config_checker(char const *filename, int inputnumber) {
+  // Declare (and) Initialise Variables
+  ifstream in;
+  int integer;
+  int temparray[26] = {0};
+  int counter = 0;
+  // Check for ERROR_OPENING_CONFIGURATION_FILE error:
+  in.open(filename);
+  if (in.fail()) return error_finder(ERROR_OPENING_CONFIGURATION_FILE,filename);
+  // Run through the file contents and check for errors:
+  while (!(in>>integer).eof()) {
+    // Check for NON_NUMERIC_CHARACTER error:
+    if (in.fail()) {in.close(); return error_finder(NON_NUMERIC_CHARACTER,filename);}
+    // Check for INVALID_INDEX error:
+    if ((integer<0)||(integer>25)) {in.close(); return error_finder(INVALID_INDEX,filename);}
+    // Check for IMPOSSIBLE_PLUGBOARD_CONFIGURATION or INVALID_REFLECTOR_MAPPING or INVALID_ROTOR_MAPPING error:
+    if ((counter<26) && temparray[integer]>0) {
+      in.close();
+      return error_finder(INVALID_REFLECTOR_MAPPING,filename);
+    }
+    temparray[integer]++;
+    counter++;
+  }
+  // Check for INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS / INCORRECT_NUMBER_OF_REFLECTOR PARAMETERS error:
+  if (counter!=26) {in.close();cout<< inputnumber <<endl; return error_finder(INCORRECT_NUMBER_OF_REFLECTOR_PARAMETERS,filename);}
+  // Close file and return NO_ERROR
+  in.close();
+  return error_finder(NO_ERROR);
+}
+*/
 
 // Rotor Position Configuraton Checker
 // Called by Configuraton Checker Function
@@ -160,3 +222,14 @@ int rotorpos_config_checker(char const *filename, int totalcount) {
   return error_finder(NO_ERROR);
 }
 
+void print_file(char *filename) {
+  int integer;
+  ifstream in;
+  in.open(filename);
+  cout << "New file: " << endl;
+  while(!(in>>integer).fail()) {
+    cout << integer << " ";
+  }
+  cout << endl;
+  in.close();
+}

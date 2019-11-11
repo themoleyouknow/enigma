@@ -3,7 +3,7 @@
 using namespace std;
 
 // Declare global constant to represent number of letter in alphabet:
-int const ALPHABET = 26;
+int const ALPH = 26;
 // Forward declaration of subclasses:
 class Plugboard;
 class Reflector;
@@ -14,10 +14,11 @@ class Enigma {
   friend class EnigmaMachine;
 protected:
   //Define Variables
-  int notch = -1; // Initialise to -1, overwritten to a non-negative number if a rotor
+  int notch[ALPH] = {0};
   Enigma *next_ptr = nullptr;
   Enigma *prev_ptr = nullptr;
-  int signalboard[ALPHABET] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};
+  int signalboard[ALPH] = {0};
+  int rel_pos = -1; // initialise to -1, overwritten to a non negative number if a rotor
 
   // Class Function Definitions
   
@@ -29,14 +30,18 @@ protected:
     // Declare variables
     ifstream in;
     int integer1, integer2;
+    int temparray[ALPH] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25};
     // Open file
     in.open(filename);
     // Run through file contents
     while (!(in>>integer1).fail() && !(in>>integer2).fail()) {
       // Make the switches
-      this->signalboard[integer1]=signalboard[integer1]^signalboard[integer2];
-      this->signalboard[integer2]=signalboard[integer2]^signalboard[integer1];
-      this->signalboard[integer1]=signalboard[integer1]^signalboard[integer2];
+      temparray[integer1]=temparray[integer1]^temparray[integer2];
+      temparray[integer2]=temparray[integer2]^temparray[integer1];
+      temparray[integer1]=temparray[integer1]^temparray[integer2];
+    }
+    for (int count=0;count<ALPH;count++) {
+      this->signalboard[count] = (temparray[count]-count+ALPH)%ALPH;
     }
     // Close file
     in.close();
@@ -57,7 +62,7 @@ protected:
   /* -- encrypt -- */
   // Function that takes as input an integer and encrypts it using this object's signalboard
   int encrypt(int integer) {
-    return integer = this->signalboard[integer];
+    return integer = (integer+this->signalboard[integer]+ALPH)%ALPH;
   }
   
   /* -- rotate -- */
@@ -69,23 +74,19 @@ protected:
     // While loop to to perform correct number of rotations
     while (iterations>0) {
       // For loop to loop through signalboard, swapping each item with the next (shift -1): 
-      for (int count = 0; count<(ALPHABET-1); count++) {
+      for (int count = 0; count<(ALPH-1); count++) {
         this->signalboard[count]=this->signalboard[count]^this->signalboard[count+1];
         this->signalboard[count+1]=this->signalboard[count+1]^this->signalboard[count];
         this->signalboard[count]=this->signalboard[count]^this->signalboard[count+1];
       }
       // Decrease iterations
       iterations--;
-      //cout << "Rotated! Top is:  "  << char (this->signalboard[0]+65) << " and notch is at " << char (this->notch +65) << endl;
-      //this->print_enigma();
-      
+      this->rel_pos = (this->rel_pos+1)%ALPH;
     }
-
     // Check to see if we've reached the notch on this rotor, the next item along is a rotor,
     // and we aren't in the initial configuration stage; if so, rotate next rotor:
-    if (this->signalboard[0]==this->notch && this->next_ptr->notch>=0 && !initial_config) {
+    if (this->next_ptr->rel_pos>=0 && this->notch[this->rel_pos]>0 && !initial_config) {
       this->next_ptr->rotate();
-      //cout << "Next Rotated!" << endl;
     }
   }
   
@@ -96,18 +97,16 @@ protected:
     // Declare temporary swap_ptr and initialise to next_ptr
     Enigma* swap_ptr = this->next_ptr;
     // Declare inverse copy of signalboard
-    int sigcopy[ALPHABET] = {0};
+    int sigcopy[ALPH] = {0};
     // Perform swap
     this->next_ptr = this->prev_ptr;
     this->prev_ptr = swap_ptr;
-    // Nest for loop to determine the inverse signalboard:
-    for (int count1 = 0; count1<ALPHABET;count1++) {
-      for (int count2 = 0; count2<ALPHABET;count2++) {
-	if (count1  == this->signalboard[count2]) {sigcopy[count1]=count2;break;}
-      }
+    // For loop to determine the inverse signalboard:
+    for (int count=0; count<ALPH; count++) {
+      sigcopy[(this->signalboard[count]+count)%ALPH] = (ALPH-this->signalboard[count])%ALPH;
     }
     //  For loop to assign all values in current signalboard to inverse signalboard:
-    for (int count = 0; count<ALPHABET;count++) {
+    for (int count = 0; count<ALPH; count++) {
       this->signalboard[count] = sigcopy[count];
     }
   }
@@ -116,11 +115,19 @@ protected:
   void print_enigma() {
     cout << "               A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " << endl;
     cout << "The board is: [";
-    for (int count = 0; count<ALPHABET; count++) {
-      cout << char (this->signalboard[count]+65) << " ";
+    for (int count = 0; count<ALPH; count++) {
+      //cout << char ((this->signalboard[count]+count)%26+65) << " ";
+      cout <<  (this->signalboard[count]) << " ";
     }
     cout << "]" << endl;
-    //cout << "               A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " << endl;
+    cout << "               A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " << endl;
+    cout << "Notches at  : [";
+    for (int count = 0; count<ALPH; count++) {
+      cout << this->notch[count] << " ";
+    }
+    cout << "]" << endl;
+    cout << endl;
+   
   }
 };
 
@@ -151,13 +158,8 @@ class Rotor : public Enigma {
     this->rotor_read(filename);
     this->prev_ptr = prev_ptr;
     this->next_ptr = next_ptr;
-    //cout << "Before setting initial position rotor is : " << endl;
-    //this->print_enigma();
-    //cout << "To be shifted by : " << initial_pos << endl;
-    //cout << "Initial position is " << initial_pos << endl;
+    this->rel_pos = 0;
     this->rotate(initial_pos,true);
-    //cout << "Now rotor is: " << endl;
-    //this->print_enigma();
   }
   /* --  Rotor Read -- */
   void rotor_read(char* filename) {
@@ -169,9 +171,11 @@ class Rotor : public Enigma {
     // Run through file contents
     while (!(in>>integer).fail()) {
       // Check if we're at the final index, if so then update notch:
-      if (count==ALPHABET) {notch=this->signalboard[integer];}
-      // Set the rotor:
-      this->signalboard[count]=integer;
+      if (count>=ALPH) {
+	notch[integer]++;}
+      else {
+	this->signalboard[count]=(integer-count+26)%26;
+      }
       count++;
     }
     // Close file
@@ -228,13 +232,13 @@ public:
     // Use plugboard to encrypt input character:
     character = this->plugboard_ptr->encrypt(character);
     // Rotate first rotor by 1 (default of rotate()), if there is one:
-    if ((next->notch)>=0) {next->rotate();}
+    if (next->rel_pos>=0) {next->rotate();}
     // While loop to process character input through the enigma machine:
     while (next!=this->plugboard_ptr) {
       // Encrypt the character using the current object's signalboard:
       character = next->encrypt(character);
       // Check if current object is a rotor:
-      if (next->notch>=0) {
+      if (next->rel_pos>=0) {
 	// If a rotor, swap the object's pointers to anticipate a return signal/reset:
 	next->swap_ptrs();
 	// Set next pointer to this object's prev_ptr (forward direction after swapping!):
