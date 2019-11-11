@@ -58,10 +58,10 @@ int error_finder(int errorcode, char const *filename) {
   case 0 : return errorcode;
   case 1 : cerr << "Insufficient number of input parameters provided." << endl; return errorcode;
   case 2 : cerr << endl << "Invalid input character provided. " << endl; return errorcode;
-  case 3 : cerr << "Invalid index provided during configuration in file " << filename << endl; return errorcode;
-  case 4 : cerr << "Non-numeric character in file " << filename << endl; return errorcode;
-  case 5 : cerr << "Impossible plugboard configuration provided in file " << filename << endl; return errorcode;
-  case 6 : cerr << "Incorrect number of parameters in plugboard file " << filename << endl; return errorcode;
+  case 3 : cerr << "Invalid index provided during configuration in file: " << filename << endl; return errorcode;
+  case 4 : cerr << "Non-numeric character in file: " << filename << endl; return errorcode;
+  case 5 : cerr << "Impossible plugboard configuration provided in file: " << filename << endl; return errorcode;
+  case 6 : cerr << "Incorrect number of parameters in plugboard file: " << filename << endl; return errorcode;
   case 7 : cerr << "Invalid rotor mapping during configuration in file: " << filename << endl; return errorcode;
   case 8 : cerr << "No rotor starting position provided in file: " << filename << endl; return errorcode;
   case 9 : cerr << "Insufficient number of mappings in reflector file: " << filename << endl; return errorcode;
@@ -118,82 +118,6 @@ int component_config_checker(char const *filename, int inputnumber) {
   in.close();
   return error_finder(NO_ERROR);
 }
-/*
-// Plugboard Configuraton Checker
-// Called by Configuraton Checker Function
-int plugboard_config_checker(char const *filename, int inputnumber) {
-  // Declare (and) Initialise Variables
-  ifstream in;
-  int integer;
-  int temparray[26] = {0};
-  int counter = 0;
-  // Check for ERROR_OPENING_CONFIGURATION_FILE error:
-  in.open(filename);
-  if (in.fail()) {return error_finder(ERROR_OPENING_CONFIGURATION_FILE,filename);}
-  // Run through the file contents and check for errors:
-  while (!(in>>integer).eof()) {
-    // Check for NON_NUMERIC_CHARACTER error:
-    if (in.fail()) {
-      in.close();
-      cerr << "Non-numeric character for mapping in plugboard file: " << filename << endl;
-      return NON_NUMERIC_CHARACTER;
-    }
-    // Check for INVALID_INDEX error:
-    if ((integer<0)||(integer>25)) {
-      in.close();
-      cerr << "Invalid index in plugboard file, " << integer << " is not a valid index in " filename << endl;
-      return INVALID_INDEX;
-    }
-    // Check for IMPOSSIBLE_PLUGBOARD_CONFIGURATION error:
-    if (temparray[integer]>0) {
-      in.close();
-      cerr << "Impossible plugboard configuration in plugboard file " << filename << endl;
-      return error_finder(IMPOSSIBLE_PLUGBOARD_CONFIGURATION,filename);
-    }
-    if (temparray[integer]>0) {
-      in.close()
-    temparray[integer]++;
-    counter++;
-  }
-  // Check for INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS / INCORRECT_NUMBER_OF_REFLECTOR PARAMETERS error:
-  if (counter%2!=0) {in.close(); return error_finder(INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS,filename);}
-  // Close file and return NO_ERROR
-  in.close();
-  return error_finder(NO_ERROR);
-}
-  
-// Reflector Configuraton Checker
-// Called by Configuraton Checker Function
-int reflector_config_checker(char const *filename, int inputnumber) {
-  // Declare (and) Initialise Variables
-  ifstream in;
-  int integer;
-  int temparray[26] = {0};
-  int counter = 0;
-  // Check for ERROR_OPENING_CONFIGURATION_FILE error:
-  in.open(filename);
-  if (in.fail()) return error_finder(ERROR_OPENING_CONFIGURATION_FILE,filename);
-  // Run through the file contents and check for errors:
-  while (!(in>>integer).eof()) {
-    // Check for NON_NUMERIC_CHARACTER error:
-    if (in.fail()) {in.close(); return error_finder(NON_NUMERIC_CHARACTER,filename);}
-    // Check for INVALID_INDEX error:
-    if ((integer<0)||(integer>25)) {in.close(); return error_finder(INVALID_INDEX,filename);}
-    // Check for IMPOSSIBLE_PLUGBOARD_CONFIGURATION or INVALID_REFLECTOR_MAPPING or INVALID_ROTOR_MAPPING error:
-    if ((counter<26) && temparray[integer]>0) {
-      in.close();
-      return error_finder(INVALID_REFLECTOR_MAPPING,filename);
-    }
-    temparray[integer]++;
-    counter++;
-  }
-  // Check for INCORRECT_NUMBER_OF_PLUGBOARD_PARAMETERS / INCORRECT_NUMBER_OF_REFLECTOR PARAMETERS error:
-  if (counter!=26) {in.close();cout<< inputnumber <<endl; return error_finder(INCORRECT_NUMBER_OF_REFLECTOR_PARAMETERS,filename);}
-  // Close file and return NO_ERROR
-  in.close();
-  return error_finder(NO_ERROR);
-}
-*/
 
 // Rotor Position Configuraton Checker
 // Called by Configuraton Checker Function
@@ -218,18 +142,5 @@ int rotorpos_config_checker(char const *filename, int totalcount) {
   in.close();
   // Check rotor position file
   if (rot_count<(totalcount-4)) {return error_finder(NO_ROTOR_STARTING_POSITION,filename);}
-  //if (rot_count!=(totalcount-4)) {return error_finder(INSUFFICIENT_NUMBER_OF_PARAMETERS);}
   return error_finder(NO_ERROR);
-}
-
-void print_file(char *filename) {
-  int integer;
-  ifstream in;
-  in.open(filename);
-  cout << "New file: " << endl;
-  while(!(in>>integer).fail()) {
-    cout << integer << " ";
-  }
-  cout << endl;
-  in.close();
 }

@@ -14,11 +14,11 @@ class Enigma {
   friend class EnigmaMachine;
 protected:
   //Define Variables
-  int notch[ALPH] = {0};
-  Enigma *next_ptr = nullptr;
-  Enigma *prev_ptr = nullptr;
-  int signalboard[ALPH] = {0};
-  int rel_pos = -1; // initialise to -1, overwritten to a non negative number if a rotor
+  int notch[ALPH] = {0};       // Integer list to represent notch locations
+  int signalboard[ALPH] = {0}; // Integer list to represnt signal mapping
+  Enigma *next_ptr = nullptr;  // Enigma pointer to next enigma object
+  Enigma *prev_ptr = nullptr;  // Enigma pointer to previous enigma object
+  int rel_pos = -1;            // initialise to -1, overwritten to a non negative number if a rotor
 
   // Class Function Definitions
   
@@ -40,6 +40,7 @@ protected:
       temparray[integer2]=temparray[integer2]^temparray[integer1];
       temparray[integer1]=temparray[integer1]^temparray[integer2];
     }
+    // Replace signalboard with appropriate shift values:
     for (int count=0;count<ALPH;count++) {
       this->signalboard[count] = (temparray[count]-count+ALPH)%ALPH;
     }
@@ -81,6 +82,7 @@ protected:
       }
       // Decrease iterations
       iterations--;
+      // Update relative position of rotor
       this->rel_pos = (this->rel_pos+1)%ALPH;
     }
     // Check to see if we've reached the notch on this rotor, the next item along is a rotor,
@@ -111,7 +113,9 @@ protected:
     }
   }
   
-  /* -- Printers -- */
+  /* -- print_enigma -- NB INESSENTIAL*/
+  // Function for the visualisation of a components internal features, used during the debugging stages
+  // and not needed for program implentation.
   void print_enigma() {
     cout << "               A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " << endl;
     cout << "The board is: [";
@@ -185,10 +189,13 @@ class Rotor : public Enigma {
 
 /* ---- Define EnigmaMachine Class ---- */
 class EnigmaMachine {
+  // Declare Enigma pointer variables:
   Enigma *plugboard_ptr = nullptr;
   Enigma *reflector_ptr = nullptr;
   Enigma *next_ptr = nullptr;
 public:
+  // Define Class functions
+  
   /* -- Constructor -- */
   EnigmaMachine(char *plug_filename, char *ref_filename) {
     // Construct plugboard and reflector on heap:
@@ -203,6 +210,7 @@ public:
     // Set EngigmaMachine's next_ptr to the reflector:
     this->next_ptr = reflector;
   }
+  
   /* -- add_rotor -- */
   // Function that takes as input a rotor configuration filename, and an initial rotor position.
   // This function adds a rotor to the Enigmamachine by constructing a rotor as per the
@@ -271,7 +279,10 @@ public:
     delete this->reflector_ptr;
     delete this->plugboard_ptr;
   }
-  
+  /* -- traverse -- NB INESSENTIAL --*/
+  // Function developed to help traverse the linked list of engima components -
+  // This was a fun piece of courseork, the rotors were more straightforward than
+  // I gave them credit..... after a week....
   void traverse() {
     Enigma *next;
     Enigma *current;
