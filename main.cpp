@@ -10,6 +10,12 @@ int config_checker(char const *filename, int inputcounter, int totalcount);
 int component_config_checker(char const *filename, int totalcount);
 int rotorpos_config_checker(char const  *filename, int totalcount);
 
+
+
+void print_file(char *filename);
+
+
+  
 /* -------- Main function -------- */
 int main(int argc, char** argv) {
   int errorcode = 0;
@@ -19,27 +25,29 @@ int main(int argc, char** argv) {
   for (int count = 1; count<argc; count++) {
     errorcode = config_checker(argv[count],count,argc);
     if (errorcode!=0) {return errorcode;}
+    print_file(argv[count]);
   }
   // Make the EnigmaMachine:
   EnigmaMachine Enigmamachine = EnigmaMachine(argv[1], argv[2]);
     
   if (argc>4){
     ifstream in;
-    int notch;
+    int initial_pos;
     int count = 3;
     in.open(argv[argc-1]);
-    while (!(in>>notch).fail()) {
-      Enigmamachine.add_rotor(argv[count],notch);
+    while (!(in>>initial_pos).fail()) {
+      Enigmamachine.add_rotor(argv[count],initial_pos);
       count++;
     }
     in.close();
   }
-  
   // Take Input and encrypt, returning an INVALID_INPUT_CHARACTER error if necessary
   char input;
+  cout << "Input is:  " << input;
   while (!(cin>>input).fail()) {
     if (input<65||input>95) {Enigmamachine.enigma_delete(); return error_finder(INVALID_INPUT_CHARACTER);}
-    cout << Enigmamachine.enigma_encrypt(input);
+    cout << input;
+    //cout << Enigmamachine.enigma_encrypt(input);
   }
   Enigmamachine.enigma_delete();
   cout << endl;
@@ -111,6 +119,18 @@ int component_config_checker(char const *filename, int inputnumber) {
   // Close file and return NO_ERROR
   in.close();
   return error_finder(NO_ERROR);
+}
+
+void print_file(char *filename) {
+  int integer;
+  ifstream in;
+  in.open(filename);
+  cout << "New file: " << endl;
+  while(!(in>>integer).fail()) {
+    cout << integer << " ";
+  }
+  cout << endl;
+  in.close();
 }
 
 // Rotor Position Configuraton Checker

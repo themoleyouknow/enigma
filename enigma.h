@@ -227,7 +227,6 @@ public:
     Enigma *next = this->plugboard_ptr->next_ptr;
     // Use plugboard to encrypt input character:
     character = this->plugboard_ptr->encrypt(character);
-    //cout << "First rotate: ";
     // Rotate first rotor by 1 (default of rotate()), if there is one:
     if ((next->notch)>=0) {next->rotate();}
     // While loop to process character input through the enigma machine:
