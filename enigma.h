@@ -79,7 +79,7 @@ protected:
     }
     // Check to see if we've reached the notch on this rotor, the next item along is a rotor,
     // and we aren't in the initial configuration stage; if so, rotate next rotor:
-    if (this->signalboard[0]==this->notch && this->next_ptr->notch>=0 /*&& !initial_config*/) {
+    if (this->signalboard[0]==this->notch && this->next_ptr->notch>=0 && !initial_config) {
       this->next_ptr->rotate();
     }
   }
@@ -115,7 +115,7 @@ protected:
       cout << char (this->signalboard[count]+65) << " ";
     }
     cout << "]" << endl;
-    cout << "               A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " << endl;
+    //cout << "               A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " << endl;
   }
 };
 
@@ -146,7 +146,12 @@ class Rotor : public Enigma {
     this->rotor_read(filename);
     this->prev_ptr = prev_ptr;
     this->next_ptr = next_ptr;
+    //cout << "Before setting initial position rotor is : " << endl;
+    //this->print_enigma();
+    //cout << "To be shifted by : " << initial_pos << endl;
     this->rotate(initial_pos,true);
+    //cout << "Now rotor is: " << endl;
+    //this->print_enigma();
   }
   /* --  Rotor Read -- */
   void rotor_read(char* filename) {
@@ -158,7 +163,7 @@ class Rotor : public Enigma {
     // Run through file contents
     while (!(in>>integer).fail()) {
       // Check if we're at the final index, if so then update notch:
-      if (count==ALPHABET) {notch=this->signalboard[integer];}
+      if (count==ALPHABET) {notch=integer;}
       // Set the rotor:
       this->signalboard[count]=integer;
       count++;
