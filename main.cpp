@@ -53,12 +53,12 @@ int error_finder(int errorcode, char const *filename) {
   case 1 : cerr << "Insufficient number of input parameters provided." << endl; return errorcode;
   case 2 : cerr << endl << "Invalid input character provided. " << endl; return errorcode;
   case 3 : cerr << "Invalid index provided during configuration in file " << filename << endl; return errorcode;
-  case 4 : cerr << "Non-numeric character in plugboard file " << filename << endl; return errorcode;
+  case 4 : cerr << "Non-numeric character in file " << filename << endl; return errorcode;
   case 5 : cerr << "Impossible plugboard configuration provided in file " << filename << endl; return errorcode;
-  case 6 : cerr << "Incorrect number of characters in plugboard file " << filename << endl; return errorcode;
+  case 6 : cerr << "Incorrect number of parameters in plugboard file " << filename << endl; return errorcode;
   case 7 : cerr << "Invalid rotor mapping during configuration in file: " << filename << endl; return errorcode;
   case 8 : cerr << "No rotor starting position provided in file: " << filename << endl; return errorcode;
-  case 9 : cerr << "Invalid reflector mapping during configuration in file: " << filename << endl; return errorcode;
+  case 9 : cerr << "Insufficient number of mappings in reflector file: " << filename << endl; return errorcode;
   case 10 : cerr << "Incorrect number of reflector parameters during configuration in file: " << filename << endl; return errorcode;
   case 11 : cerr << "Unable to open configuration file: " << filename << endl; return errorcode;
   default : cerr << "Unknown error code submitted!" << errorcode << endl; return errorcode;;  

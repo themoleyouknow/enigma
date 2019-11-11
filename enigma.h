@@ -79,7 +79,7 @@ protected:
     }
     // Check to see if we've reached the notch on this rotor, the next item along is a rotor,
     // and we aren't in the initial configuration stage; if so, rotate next rotor:
-    if (this->signalboard[0]==this->notch && this->next_ptr->notch>=0 && !initial_config) {
+    if (this->signalboard[0]==this->notch && this->next_ptr->notch>=0 /*&& !initial_config*/) {
       this->next_ptr->rotate();
     }
   }
