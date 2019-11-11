@@ -67,7 +67,7 @@ protected:
     // Declare iterations variable
     int iterations = rot_num;
     // While loop to to perform correct number of rotations
-    while (iterations>=1) {
+    while (iterations>0) {
       // For loop to loop through signalboard, swapping each item with the next (shift -1): 
       for (int count = 0; count<(ALPHABET-1); count++) {
         this->signalboard[count]=this->signalboard[count]^this->signalboard[count+1];
@@ -76,11 +76,16 @@ protected:
       }
       // Decrease iterations
       iterations--;
+      //cout << "Rotated! Top is:  "  << char (this->signalboard[0]+65) << " and notch is at " << char (this->notch +65) << endl;
+      //this->print_enigma();
+      
     }
+
     // Check to see if we've reached the notch on this rotor, the next item along is a rotor,
     // and we aren't in the initial configuration stage; if so, rotate next rotor:
     if (this->signalboard[0]==this->notch && this->next_ptr->notch>=0 && !initial_config) {
       this->next_ptr->rotate();
+      //cout << "Next Rotated!" << endl;
     }
   }
   
@@ -149,6 +154,7 @@ class Rotor : public Enigma {
     //cout << "Before setting initial position rotor is : " << endl;
     //this->print_enigma();
     //cout << "To be shifted by : " << initial_pos << endl;
+    //cout << "Initial position is " << initial_pos << endl;
     this->rotate(initial_pos,true);
     //cout << "Now rotor is: " << endl;
     //this->print_enigma();
@@ -163,7 +169,7 @@ class Rotor : public Enigma {
     // Run through file contents
     while (!(in>>integer).fail()) {
       // Check if we're at the final index, if so then update notch:
-      if (count==ALPHABET) {notch=integer;}
+      if (count==ALPHABET) {notch=this->signalboard[integer];}
       // Set the rotor:
       this->signalboard[count]=integer;
       count++;
@@ -221,6 +227,7 @@ public:
     Enigma *next = this->plugboard_ptr->next_ptr;
     // Use plugboard to encrypt input character:
     character = this->plugboard_ptr->encrypt(character);
+    //cout << "First rotate: ";
     // Rotate first rotor by 1 (default of rotate()), if there is one:
     if ((next->notch)>=0) {next->rotate();}
     // While loop to process character input through the enigma machine:
