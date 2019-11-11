@@ -50,17 +50,17 @@ int main(int argc, char** argv) {
 int error_finder(int errorcode, char const *filename) {
   switch(errorcode) {
   case 0 : return errorcode;
-  case 1 : cerr << "Error: Insufficient number of input parameters provided." << endl; return errorcode;
-  case 2 : cerr << endl << "Error: Invalid input character provided. " << endl; return errorcode;
-  case 3 : cerr << "Error: Invalid index provided during configuration in file: " << filename << endl; return errorcode;
-  case 4 : cerr << "Error: Non-numeric character provided during configuration in file: " << filename << endl; return errorcode;
-  case 5 : cerr << "Error: Impossible plugboard configuration provided in file: " << filename << endl; return errorcode;
-  case 6 : cerr << "Error: Incorrect number of plugboard parameters provided during configuration in file: " << filename << endl; return errorcode;
-  case 7 : cerr << "Error: Invalid rotor mapping during configuration in file: " << filename << endl; return errorcode;
-  case 8 : cerr << "Error: No rotor starting position provided in file: " << filename << endl; return errorcode;
-  case 9 : cerr << "Error: Invalid reflector mapping during configuration in file: " << filename << endl; return errorcode;
-  case 10 : cerr << "Error: Incorrect number of reflector parameters during configuration in file: " << filename << endl; return errorcode;
-  case 11 : cerr << "Error: Unable to open configuration file: " << filename << endl; return errorcode;
+  case 1 : cerr << "Insufficient number of input parameters provided." << endl; return errorcode;
+  case 2 : cerr << endl << "Invalid input character provided. " << endl; return errorcode;
+  case 3 : cerr << "Invalid index provided during configuration in file " << filename << endl; return errorcode;
+  case 4 : cerr << "Non-numeric character in plugboard file " << filename << endl; return errorcode;
+  case 5 : cerr << "Impossible plugboard configuration provided in file " << filename << endl; return errorcode;
+  case 6 : cerr << "Incorrect number of characters in plugboard file " << filename << endl; return errorcode;
+  case 7 : cerr << "Invalid rotor mapping during configuration in file: " << filename << endl; return errorcode;
+  case 8 : cerr << "No rotor starting position provided in file: " << filename << endl; return errorcode;
+  case 9 : cerr << "Invalid reflector mapping during configuration in file: " << filename << endl; return errorcode;
+  case 10 : cerr << "Incorrect number of reflector parameters during configuration in file: " << filename << endl; return errorcode;
+  case 11 : cerr << "Unable to open configuration file: " << filename << endl; return errorcode;
   default : cerr << "Unknown error code submitted!" << errorcode << endl; return errorcode;;  
   }
 }
@@ -136,7 +136,7 @@ int rotorpos_config_checker(char const *filename, int totalcount) {
   in.close();
   // Check rotor position file
   if (rot_count<(totalcount-4)) {return error_finder(NO_ROTOR_STARTING_POSITION,filename);}
-  if (rot_count!=(totalcount-4)) {return error_finder(INSUFFICIENT_NUMBER_OF_PARAMETERS);}
+  //if (rot_count!=(totalcount-4)) {return error_finder(INSUFFICIENT_NUMBER_OF_PARAMETERS);}
   return error_finder(NO_ERROR);
 }
 
