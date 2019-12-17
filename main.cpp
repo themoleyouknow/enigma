@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
   for (int count = 1; count<argc; count++) {
     errorcode = config_checker(argv[count],count,argc);
     if (errorcode!=0) {return errorcode;}
-    //print_file(argv[count]);
   }
   // Make the EnigmaMachine:
   EnigmaMachine Enigmamachine = EnigmaMachine(argv[1], argv[2]);
